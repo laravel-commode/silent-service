@@ -33,6 +33,14 @@ class SilentServiceServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->testInstance->register();
     }
 
+    public function testProvides()
+    {
+        $this->assertSame(
+            [SilentServiceServiceProvider::PROVIDES_MANAGER, SilentManager::class],
+            $this->testInstance->provides()
+        );
+    }
+
     protected function tearDown()
     {
         unset($this->testInstance);

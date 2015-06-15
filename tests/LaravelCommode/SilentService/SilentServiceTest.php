@@ -59,8 +59,6 @@ class SilentServiceTest extends PHPUnit_Framework_TestCase
                 {
                     case SilentServiceServiceProvider::PROVIDES_MANAGER:
                         return $this->silentManager;
-                    default:
-
                 }
             }));
 
