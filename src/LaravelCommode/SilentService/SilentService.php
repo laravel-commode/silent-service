@@ -43,15 +43,11 @@ abstract class SilentService extends ServiceProvider
     }
 
     /**
-     * @param array|string $resolvable
+     * @param array $resolvable
      * @param callable $do
      */
-    protected function with($resolvable, callable $do)
+    protected function with(array $resolvable, callable $do)
     {
-        if (is_string($resolvable)) {
-            $resolvable = [$resolvable];
-        }
-
         $resolved = [];
 
         foreach ($resolvable as $resolvableName) {
@@ -73,11 +69,11 @@ abstract class SilentService extends ServiceProvider
             $this->app->register(SilentServiceServiceProvider::class);
         }
 
-        $this->with(SilentServiceServiceProvider::PROVIDES_MANAGER, function (SilentManager $manager) {
+        $this->with([SilentServiceServiceProvider::PROVIDES_MANAGER], function (SilentManager $manager) {
             $manager->registerServices($this->uses());
         });
 
-        foreach ($aliases = $this->aliases() as $alias => $target) {
+        foreach ($this->aliases() as $alias => $target) {
             $this->app->alias($alias, $target);
         }
 
