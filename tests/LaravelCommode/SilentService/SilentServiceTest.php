@@ -86,7 +86,7 @@ class SilentServiceTest extends PHPUnit_Framework_TestCase
         foreach ($methodList as $methodName) {
             $reflectionMethod = new \ReflectionMethod(SilentService::class, $methodName);
             $reflectionMethod->setAccessible(true);
-            $this->assertTrue(is_array($reflectionMethod->invoke($this->testInstance)));
+            $reflectionMethod->invoke($this->testInstance);
         }
     }
 
