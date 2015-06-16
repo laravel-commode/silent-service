@@ -19,5 +19,5 @@
             "LaravelCommode\\SilentService\\": "src/LaravelCommode/SilentService"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }
