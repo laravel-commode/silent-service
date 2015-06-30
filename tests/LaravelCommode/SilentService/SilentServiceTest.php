@@ -2,6 +2,7 @@
 
 namespace LaravelCommode\SilentService;
 
+use Illuminate\Foundation\AliasLoader;
 use PHPUnit_Framework_TestCase;
 use PHPUnit_Framework_MockObject_MockObject as Mock;
 
@@ -65,12 +66,27 @@ class SilentServiceTest extends PHPUnit_Framework_TestCase
         $this->application->expects($this->any())->method('getLoadedProviders')
             ->will($this->returnValue([]));
 
-        list($testAliasKey, $testAliasValue) = [uniqid(), uniqid()];
+        list($testAliasKey, $testAliasValue) = [uniqid('Alias'), uniqid('Facade')];
 
         $this->testInstance->expects($this->atLeastOnce())->method('aliases')
             ->will($this->returnValue([$testAliasKey => $testAliasValue]));
 
-        $this->application->expects($this->atLeastOnce())->method('alias')
+        $this->application->expects($this->once())->method('booting')
+            ->will($this->returnCallback(function (callable $callback) {
+                $callback();
+            }));
+
+        /**
+         * @var AliasLoader|Mock $aliasLoaderMock
+         */
+        $aliasLoaderMock = $this->getMock(AliasLoader::class, [], [[]], '');
+
+        AliasLoader::setInstance($aliasLoaderMock);
+        $aliasLoaderMock->setAliases([]);
+        $aliasLoaderMock->expects($this->any())->method('getAliases')
+            ->will($this->returnValue([]));
+
+        $aliasLoaderMock->expects($this->once())->method('alias')
             ->with($testAliasKey, $testAliasValue);
 
         $this->testInstance->register();

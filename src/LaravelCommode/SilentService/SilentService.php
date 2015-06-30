@@ -1,6 +1,7 @@
 <?php
 namespace LaravelCommode\SilentService;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 
 abstract class SilentService extends ServiceProvider
@@ -73,11 +74,15 @@ abstract class SilentService extends ServiceProvider
             $manager->registerServices($this->uses());
         });
 
-        foreach ($this->aliases() as $alias => $target) {
-            $this->app->alias($alias, $target);
-        }
+        $this->app->booting(function () {
+            $aliasLoader = AliasLoader::getInstance();
 
-        $this->app->booting([$this, 'launching']);
+            foreach ($this->aliases() as $alias => $target) {
+                $aliasLoader->alias($alias, $target);
+            }
+
+            $this->launching();
+        });
 
         $this->registering();
     }
