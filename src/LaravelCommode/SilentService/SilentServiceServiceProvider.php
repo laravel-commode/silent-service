@@ -2,7 +2,7 @@
 
 namespace LaravelCommode\SilentService;
 
-use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class SilentServiceServiceProvider extends ServiceProvider

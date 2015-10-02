@@ -1,15 +1,7 @@
-<?php
+<?php namespace LaravelCommode\SilentService;
 
-namespace LaravelCommode\SilentService;
-
-use PHPUnit_Framework_MockObject_MockObject as Mock;
-
-class SilentServiceServiceProviderTest extends \PHPUnit_Framework_TestCase
+class SilentServiceServiceProviderTest extends TestAbstraction
 {
-    /**
-     * @var \Illuminate\Foundation\Application|Mock
-     */
-    private $application;
 
     /**
      * @var SilentServiceServiceProvider
@@ -18,16 +10,15 @@ class SilentServiceServiceProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->application = $this->getMock('Illuminate\Foundation\Application', ['singleton']);
-        $this->testInstance = new SilentServiceServiceProvider($this->application);
         parent::setUp();
+        $this->testInstance = new SilentServiceServiceProvider($this->getApplicationMock());
     }
 
     public function testRegistering()
     {
-        $this->application->expects($this->atLeastOnce())->method('singleton')
+        $this->getApplicationMock()->expects($this->atLeastOnce())->method('singleton')
             ->with(SilentServiceServiceProvider::PROVIDES_MANAGER, $this->callback(function ($callable) {
-                return $callable($this->application) instanceof SilentManager;
+                return $callable($this->getApplicationMock()) instanceof SilentManager;
             }));
 
         $this->testInstance->register();
@@ -44,7 +35,6 @@ class SilentServiceServiceProviderTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->testInstance);
-        unset($this->application);
         parent::tearDown();
     }
 }

@@ -9,7 +9,8 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "illuminate/support": "5.1.*"
+        "illuminate/support": "5.1.*",
+        "illuminate/container": "5.1.*"
     },
     "require-dev": {
         "satooshi/php-coveralls": "dev-master"

@@ -15,4 +15,12 @@
             <directory suffix=".php">./tests/</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <includePath>/path/to/ur/project</includePath>
+    </php>
+    <logging>
+        <log type="coverage-html" target="./doc" charset="UTF-8"
+             yui="true" highlight="true"
+             lowUpperBound="50" highLowerBound="80"/>
+    </logging>
 </phpunit>

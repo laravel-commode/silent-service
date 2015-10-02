@@ -2,7 +2,7 @@
 
 namespace LaravelCommode\SilentService;
 
-use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Foundation\Application;
 
 /**
  * Class SilentManager.
@@ -10,9 +10,14 @@ use Illuminate\Foundation\Application;
 class SilentManager
 {
     /**
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     private $application;
+
+    /**
+     * @var string[]
+     */
+    private $loaded = [];
 
     public function __construct(Application $application)
     {
@@ -37,9 +42,18 @@ class SilentManager
     private function launchServices(array $services)
     {
         foreach ($services as $service) {
+            $this->loaded[] = $service;
             $this->application->registerDeferredProvider($service);
         }
 
         return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getLoaded()
+    {
+        return $this->loaded;
     }
 }

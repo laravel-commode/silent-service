@@ -6,40 +6,37 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use PHPUnit_Framework_MockObject_MockObject as Mock;
 
-class SilentManagerTest extends \PHPUnit_Framework_TestCase
+class SilentManagerTest extends TestAbstraction
 {
-    /**
-     * @var Application|Mock
-     */
-    private $application;
 
     /**
      * @var SilentManager
      */
     private $testInstance;
 
+    protected function applicationMocksMethods()
+    {
+        return ['getLoadedProviders'];
+    }
+
     protected function setUp()
     {
-        $this->application = $this->getMock(
-            'Illuminate\Foundation\Application',
-            ['getLoadedProviders', 'registerDeferredProvider']
-        );
-
-        $this->testInstance = new SilentManager($this->application);
-
         parent::setUp();
+        $this->testInstance = new SilentManager($this->getApplicationMock());
     }
 
     public function testRegistrations()
     {
         $firstRegister = ['Service1', 'Service2'];
 
-        $this->application->expects($this->any())->method('getLoadedProviders')
+        $this->getApplicationMock()->expects($this->any())->method('getLoadedProviders')
             ->will($this->returnCallback(function () use ($firstRegister) {
                 return [$firstRegister[0]];
             }));
 
         $this->testInstance->registerServices($firstRegister);
+
+        $this->assertSame($firstRegister[1], $this->testInstance->getLoaded()[0]);
     }
 
     public function testRegistration()
@@ -48,17 +45,18 @@ class SilentManagerTest extends \PHPUnit_Framework_TestCase
         $thenRegister = 'Service3';
 
 
-        $this->application->expects($this->any())->method('getLoadedProviders')
+        $this->getApplicationMock()->expects($this->any())->method('getLoadedProviders')
             ->will($this->returnCallback(function () use ($firstRegister) {
                 return $firstRegister;
             }));
 
         $this->testInstance->registerService($thenRegister);
+
+        $this->assertContains($thenRegister, $this->testInstance->getLoaded());
     }
 
     protected function tearDown()
     {
-        unset($this->application);
         unset($this->testInstance);
         parent::tearDown();
     }

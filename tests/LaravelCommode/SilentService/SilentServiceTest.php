@@ -6,13 +6,8 @@ use Illuminate\Foundation\AliasLoader;
 use PHPUnit_Framework_TestCase;
 use PHPUnit_Framework_MockObject_MockObject as Mock;
 
-class SilentServiceTest extends PHPUnit_Framework_TestCase
+class SilentServiceTest extends TestAbstraction
 {
-    /**
-     * @var \Illuminate\Foundation\Application|Mock
-     */
-    private $application;
-
     /**
      * @var SilentService|Mock
      */
@@ -23,16 +18,18 @@ class SilentServiceTest extends PHPUnit_Framework_TestCase
      */
     private $silentManager;
 
+    protected function applicationMocksMethods()
+    {
+        return ['getLoadedProviders'];
+    }
+
     protected function setUp()
     {
-        $this->application = $this->getMock(
-            'Illuminate\Foundation\Application',
-            ['singleton', 'bound', 'register', 'make', 'getLoadedProviders', 'booting', 'alias']
-        );
+        parent::setUp();
 
         $this->testInstance = $this->getMockForAbstractClass(
             SilentService::class,
-            [$this->application],
+            [$this->getApplicationMock()],
             '',
             true,
             true,
@@ -40,30 +37,29 @@ class SilentServiceTest extends PHPUnit_Framework_TestCase
             ['aliases']
         );
 
-        $this->silentManager = new SilentManager($this->application);
+        $this->silentManager = new SilentManager($this->getApplicationMock());
 
-        parent::setUp();
     }
 
     public function testRegister()
     {
-        $this->application->expects($this->atLeastOnce())->method('bound')
+        $this->getApplicationMock()
+            ->expects($this->atLeastOnce())->method('bound')
             ->with(SilentServiceServiceProvider::PROVIDES_MANAGER)
             ->will($this->returnValue(false));
 
-        $this->application->expects($this->atLeastOnce())->method('register')
+        $this->getApplicationMock()->expects($this->atLeastOnce())->method('register')
             ->with(SilentServiceServiceProvider::class);
 
-        $this->application->expects($this->any())->method('make')
+        $this->getApplicationMock()->expects($this->any())->method('make')
             ->will($this->returnCallback(function ($make) {
-                switch($make)
-                {
+                switch ($make) {
                     case SilentServiceServiceProvider::PROVIDES_MANAGER:
                         return $this->silentManager;
                 }
             }));
 
-        $this->application->expects($this->any())->method('getLoadedProviders')
+        $this->getApplicationMock()->expects($this->any())->method('getLoadedProviders')
             ->will($this->returnValue([]));
 
         list($testAliasKey, $testAliasValue) = [uniqid('Alias'), uniqid('Facade')];
@@ -71,7 +67,7 @@ class SilentServiceTest extends PHPUnit_Framework_TestCase
         $this->testInstance->expects($this->atLeastOnce())->method('aliases')
             ->will($this->returnValue([$testAliasKey => $testAliasValue]));
 
-        $this->application->expects($this->once())->method('booting')
+        $this->getApplicationMock()->expects($this->once())->method('booting')
             ->will($this->returnCallback(function (callable $callback) {
                 $callback();
             }));
@@ -107,7 +103,6 @@ class SilentServiceTest extends PHPUnit_Framework_TestCase
     {
         unset($this->testInstance);
         unset($this->silentManager);
-        unset($this->application);
         parent::tearDown();
     }
 }
