@@ -36,7 +36,7 @@ class SilentManager
 
     private function differUnique(array $serviceList)
     {
-        return array_diff($serviceList, $this->application->getLoadedProviders());
+        return array_diff($serviceList, array_keys($this->application->getLoadedProviders()));
     }
 
     private function launchServices(array $services)

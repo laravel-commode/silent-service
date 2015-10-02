@@ -31,7 +31,7 @@ class SilentManagerTest extends TestAbstraction
 
         $this->getApplicationMock()->expects($this->any())->method('getLoadedProviders')
             ->will($this->returnCallback(function () use ($firstRegister) {
-                return [$firstRegister[0]];
+                return [$firstRegister[0] => true];
             }));
 
         $this->testInstance->registerServices($firstRegister);
@@ -41,7 +41,7 @@ class SilentManagerTest extends TestAbstraction
 
     public function testRegistration()
     {
-        $firstRegister = ['Service1', 'Service2'];
+        $firstRegister = ['Service1' => true, 'Service2' => true];
         $thenRegister = 'Service3';
 
 
